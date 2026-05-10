@@ -2,6 +2,7 @@
 M365 Multi-Tenant Admin Platform
 FastAPI Application Entry Point
 """
+import logging
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -22,8 +23,16 @@ from app.routers import (
     auth_router,
     storage_router,
     health_report_router,
-    report_center_router
+    report_center_router,
 )
+from app.services.graph_client import GraphClient
+
+# Configure structured logging
+logging.basicConfig(
+    level=logging.DEBUG if settings.DEBUG else logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -31,9 +40,11 @@ async def lifespan(app: FastAPI):
     """Application lifespan events"""
     # Startup
     await init_db()
+    logger.info("Database initialized")
     yield
-    # Shutdown
-    pass
+    # Shutdown — close the shared HTTP connection pool
+    await GraphClient.close_http_client()
+    logger.info("HTTP client closed")
 
 
 app = FastAPI(

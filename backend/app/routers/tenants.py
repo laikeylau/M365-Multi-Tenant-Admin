@@ -9,6 +9,7 @@ from app.database import get_db
 from app.models import Tenant
 from app.schemas import TenantCreate, TenantUpdate, TenantResponse, TenantSummary
 from app.services.graph_client import graph_manager, GraphClient
+from app.services.cache import get_cached, set_cached, invalidate as invalidate_cache
 from app.security.tenant_secrets import encrypt_tenant_secret, decrypt_tenant_secret
 
 router = APIRouter(prefix="/tenants", tags=["Tenants"])
@@ -94,6 +95,7 @@ async def update_tenant(
     # Clear cached client if credentials changed
     if "client_secret" in update_data:
         graph_manager.remove_client(tenant.tenant_id)
+        await invalidate_cache(tenant.id)
     
     await db.commit()
     await db.refresh(tenant)
@@ -109,13 +111,14 @@ async def delete_tenant(tenant_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Tenant not found")
     
     graph_manager.remove_client(tenant.tenant_id)
+    await invalidate_cache(tenant.id)
     await db.delete(tenant)
     await db.commit()
 
 
 @router.get("/{tenant_id}/summary", response_model=TenantSummary)
 async def get_tenant_summary(tenant_id: int, db: AsyncSession = Depends(get_db)):
-    """Get summary information for a tenant"""
+    """Get summary information for a tenant (cached for 10 minutes)"""
     result = await db.execute(select(Tenant).where(Tenant.id == tenant_id))
     tenant = result.scalar_one_or_none()
     if not tenant:
@@ -127,6 +130,19 @@ async def get_tenant_summary(tenant_id: int, db: AsyncSession = Depends(get_db))
         tenant_id=tenant.tenant_id,
         is_connected=False
     )
+    
+    # Try cache first
+    CACHE_KEY = "tenant_summary"
+    cached = await get_cached(tenant.id, CACHE_KEY)
+    if cached is not None:
+        summary.display_name = cached.get("displayName")
+        summary.user_count = cached.get("userCount", 0)
+        summary.active_users = cached.get("activeUsers", 0)
+        summary.total_licenses = cached.get("totalLicenses", 0)
+        summary.consumed_licenses = cached.get("consumedLicenses", 0)
+        summary.license_usage_percent = cached.get("licenseUsagePercent", 0)
+        summary.is_connected = True
+        return summary
     
     try:
         client = graph_manager.get_client(
@@ -142,6 +158,7 @@ async def get_tenant_summary(tenant_id: int, db: AsyncSession = Depends(get_db))
         summary.consumed_licenses = data.get("consumedLicenses", 0)
         summary.license_usage_percent = data.get("licenseUsagePercent", 0)
         summary.is_connected = True
+        await set_cached(tenant.id, CACHE_KEY, data, ttl_minutes=10)
     except Exception as e:
         summary.error = str(e)
     
