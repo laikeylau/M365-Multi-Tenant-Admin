@@ -2,104 +2,139 @@ import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-interface NavItem {
+interface NavChild {
     path: string;
     label: string;
     icon: string;
-    children?: { path: string; label: string }[];
 }
 
-const navItems: NavItem[] = [
-    { path: '/', label: '仪表盘', icon: '📊' },
+interface NavGroup {
+    label: string;
+    icon: string;
+    children: NavChild[];
+}
+
+const navGroups: NavGroup[] = [
     {
-        path: '/users',
-        label: '用户管理',
-        icon: '👥',
+        label: '概览',
+        icon: '🏠',
         children: [
-            { path: '/users', label: '用户列表' },
-            { path: '/users/invite', label: '用户邀请' },
-            { path: '/users/import', label: '批量导入' },
+            { path: '/', label: '仪表盘', icon: '📊' },
         ],
     },
-    { path: '/licenses', label: '许可证管理', icon: '📜' },
-    { path: '/storage', label: '存储管理', icon: '💾' },
-    { path: '/groups', label: '组和角色', icon: '👔' },
-    { path: '/domains', label: '域名管理', icon: '🌐' },
-    { path: '/audit', label: '审计日志', icon: '📋' },
-    { path: '/health', label: '服务健康', icon: '💚' },
-    { path: '/reports', label: '报告导出', icon: '📈' },
-    { path: '/report-center', label: '报表中心', icon: '📊' },
-    { path: '/health-report', label: '健检报告', icon: '🏥' },
-    { path: '/tenants', label: '多租户管理', icon: '🏢' },
-    { path: '/settings', label: '账户设置', icon: '⚙️' },
+    {
+        label: '身份与访问',
+        icon: '🔐',
+        children: [
+            { path: '/users', label: '用户管理', icon: '👥' },
+            { path: '/groups', label: '组和角色', icon: '👔' },
+            { path: '/entra', label: 'Entra ID', icon: '🆔' },
+            { path: '/domains', label: '域名管理', icon: '🌐' },
+            { path: '/licenses', label: '许可证管理', icon: '📜' },
+        ],
+    },
+    {
+        label: '服务管理',
+        icon: '⚙️',
+        children: [
+            { path: '/exchange', label: 'Exchange Online', icon: '📧' },
+            { path: '/teams', label: 'Teams 管理', icon: '💬' },
+            { path: '/sharepoint', label: 'SharePoint 管理', icon: '📁' },
+            { path: '/storage', label: '存储管理', icon: '💾' },
+            { path: '/intune', label: 'Intune 设备', icon: '📱' },
+        ],
+    },
+    {
+        label: '安全与合规',
+        icon: '🛡️',
+        children: [
+            { path: '/security', label: 'Security/Defender', icon: '🚨' },
+            { path: '/compliance', label: 'Purview 合规', icon: '📋' },
+        ],
+    },
+    {
+        label: '监控与报告',
+        icon: '📈',
+        children: [
+            { path: '/health', label: '服务健康', icon: '💚' },
+            { path: '/health-report', label: '健检报告', icon: '🏥' },
+            { path: '/audit', label: '审计日志', icon: '📋' },
+            { path: '/report-center', label: '报表中心', icon: '📊' },
+            { path: '/reports', label: '报告导出', icon: '📈' },
+        ],
+    },
+    {
+        label: '系统管理',
+        icon: '🏢',
+        children: [
+            { path: '/tenants', label: '多租户管理', icon: '🏢' },
+            { path: '/settings', label: '账户设置', icon: '⚙️' },
+        ],
+    },
 ];
 
 const Sidebar: React.FC = () => {
     const { logout } = useAuth();
     const location = useLocation();
-    const [expandedItems, setExpandedItems] = React.useState<string[]>(['/users']);
-
-    const toggleExpand = (path: string) => {
-        setExpandedItems((prev) =>
-            prev.includes(path) ? prev.filter((p) => p !== path) : [...prev, path]
+    const [expandedGroups, setExpandedGroups] = React.useState<string[]>(() => {
+        // Auto-expand group that contains the active route
+        const active = navGroups.find(g =>
+            g.children.some(c => c.path === '/' ? location.pathname === '/' : location.pathname.startsWith(c.path))
         );
-    };
+        return active ? [active.label] : navGroups.map(g => g.label);
+    });
 
-    const isActive = (path: string) => {
-        if (path === '/') return location.pathname === '/';
-        return location.pathname.startsWith(path);
+    const toggleGroup = (label: string) => {
+        setExpandedGroups(prev =>
+            prev.includes(label) ? prev.filter(l => l !== label) : [...prev, label]
+        );
     };
 
     return (
         <aside className="sidebar">
             <div className="sidebar-header">
-                <span className="sidebar-logo">Office 365 管理</span>
+                <span className="sidebar-logo">M365 管理平台</span>
             </div>
             <nav className="sidebar-nav">
-                {navItems.map((item) => (
-                    <div key={item.path}>
-                        {item.children ? (
-                            <>
-                                <div
-                                    className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
-                                    onClick={() => toggleExpand(item.path)}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <span className="nav-item-icon">{item.icon}</span>
-                                    <span className="nav-item-text">{item.label}</span>
-                                    <span style={{ marginLeft: 'auto', fontSize: '12px' }}>
-                                        {expandedItems.includes(item.path) ? '▼' : '▶'}
-                                    </span>
-                                </div>
-                                {expandedItems.includes(item.path) && (
-                                    <div className="nav-submenu">
-                                        {item.children.map((child) => (
-                                            <NavLink
-                                                key={child.path}
-                                                to={child.path}
-                                                className={({ isActive }) =>
-                                                    `nav-item ${isActive ? 'active' : ''}`
-                                                }
-                                            >
-                                                <span className="nav-item-text">{child.label}</span>
-                                            </NavLink>
-                                        ))}
-                                    </div>
-                                )}
-                            </>
-                        ) : (
-                            <NavLink
-                                to={item.path}
-                                className={({ isActive }) =>
-                                    `nav-item ${isActive ? 'active' : ''}`
-                                }
+                {navGroups.map((group) => {
+                    const isExpanded = expandedGroups.includes(group.label);
+                    const hasActive = group.children.some(c =>
+                        c.path === '/' ? location.pathname === '/' : location.pathname.startsWith(c.path)
+                    );
+
+                    return (
+                        <div key={group.label}>
+                            <div
+                                className={`nav-item ${hasActive ? 'active' : ''}`}
+                                onClick={() => toggleGroup(group.label)}
+                                style={{ cursor: 'pointer', fontSize: '13px', fontWeight: 600, opacity: 0.85 }}
                             >
-                                <span className="nav-item-icon">{item.icon}</span>
-                                <span className="nav-item-text">{item.label}</span>
-                            </NavLink>
-                        )}
-                    </div>
-                ))}
+                                <span className="nav-item-icon">{group.icon}</span>
+                                <span className="nav-item-text">{group.label}</span>
+                                <span style={{ marginLeft: 'auto', fontSize: '11px' }}>
+                                    {isExpanded ? '▼' : '▶'}
+                                </span>
+                            </div>
+                            {isExpanded && (
+                                <div className="nav-submenu">
+                                    {group.children.map((child) => (
+                                        <NavLink
+                                            key={child.path}
+                                            to={child.path}
+                                            end={child.path === '/'}
+                                            className={({ isActive }) =>
+                                                `nav-item ${isActive ? 'active' : ''}`
+                                            }
+                                        >
+                                            <span className="nav-item-icon">{child.icon}</span>
+                                            <span className="nav-item-text">{child.label}</span>
+                                        </NavLink>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
             </nav>
 
             {/* Logout Button */}

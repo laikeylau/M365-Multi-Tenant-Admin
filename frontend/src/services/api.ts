@@ -256,3 +256,127 @@ export const reportCenterApi = {
 
 export default api;
 
+// ==================== Exchange Online API ====================
+export const exchangeApi = {
+    getTransportRules: (tenantId: number) =>
+        api.get(`/exchange/${tenantId}/transport-rules`),
+    getMailboxSettings: (tenantId: number, userId: string) =>
+        api.get(`/exchange/${tenantId}/mailbox-settings/${userId}`),
+    updateMailboxSettings: (tenantId: number, userId: string, data: any) =>
+        api.patch(`/exchange/${tenantId}/mailbox-settings/${userId}`, data),
+    getMailFolders: (tenantId: number, userId: string) =>
+        api.get(`/exchange/${tenantId}/mail-folders/${userId}`),
+    getMessages: (tenantId: number, userId: string, top?: number) =>
+        api.get(`/exchange/${tenantId}/messages/${userId}`, { params: { top } }),
+};
+
+// ==================== Entra ID API ====================
+export const entraApi = {
+    getConditionalAccessPolicies: (tenantId: number) =>
+        api.get(`/entra/${tenantId}/conditional-access`),
+    getConditionalAccessPolicy: (tenantId: number, policyId: string) =>
+        api.get(`/entra/${tenantId}/conditional-access/${policyId}`),
+    getApplications: (tenantId: number) =>
+        api.get(`/entra/${tenantId}/applications`),
+    getApplication: (tenantId: number, appId: string) =>
+        api.get(`/entra/${tenantId}/applications/${appId}`),
+    getServicePrincipals: (tenantId: number) =>
+        api.get(`/entra/${tenantId}/service-principals`),
+    getServicePrincipal: (tenantId: number, spId: string) =>
+        api.get(`/entra/${tenantId}/service-principals/${spId}`),
+    getNamedLocations: (tenantId: number) =>
+        api.get(`/entra/${tenantId}/named-locations`),
+    getRiskyUsers: (tenantId: number) =>
+        api.get(`/entra/${tenantId}/risky-users`),
+    getRiskDetections: (tenantId: number) =>
+        api.get(`/entra/${tenantId}/risk-detections`),
+    getMfaRegistration: (tenantId: number) =>
+        api.get(`/entra/${tenantId}/mfa-registration`),
+};
+
+// ==================== Security / Defender API ====================
+export const securityApi = {
+    getAlerts: (tenantId: number, top?: number) =>
+        api.get(`/security/${tenantId}/alerts`, { params: { top } }),
+    getAlert: (tenantId: number, alertId: string) =>
+        api.get(`/security/${tenantId}/alerts/${alertId}`),
+    updateAlert: (tenantId: number, alertId: string, data: any) =>
+        api.patch(`/security/${tenantId}/alerts/${alertId}`, data),
+    getIncidents: (tenantId: number, top?: number) =>
+        api.get(`/security/${tenantId}/incidents`, { params: { top } }),
+    getIncident: (tenantId: number, incidentId: string) =>
+        api.get(`/security/${tenantId}/incidents/${incidentId}`),
+    updateIncident: (tenantId: number, incidentId: string, data: any) =>
+        api.patch(`/security/${tenantId}/incidents/${incidentId}`, data),
+    getSecureScores: (tenantId: number, top?: number) =>
+        api.get(`/security/${tenantId}/secure-scores`, { params: { top } }),
+};
+
+// ==================== Intune / Device Management API ====================
+export const intuneApi = {
+    getDevices: (tenantId: number) =>
+        api.get(`/intune/${tenantId}/devices`),
+    getDevice: (tenantId: number, deviceId: string) =>
+        api.get(`/intune/${tenantId}/devices/${deviceId}`),
+    wipeDevice: (tenantId: number, deviceId: string, keepEnrollmentData?: boolean) =>
+        api.post(`/intune/${tenantId}/devices/${deviceId}/wipe`, { keepEnrollmentData }),
+    retireDevice: (tenantId: number, deviceId: string) =>
+        api.post(`/intune/${tenantId}/devices/${deviceId}/retire`),
+    lockDevice: (tenantId: number, deviceId: string) =>
+        api.post(`/intune/${tenantId}/devices/${deviceId}/lock`),
+    resetPasscode: (tenantId: number, deviceId: string) =>
+        api.post(`/intune/${tenantId}/devices/${deviceId}/reset-passcode`),
+    syncDevice: (tenantId: number, deviceId: string) =>
+        api.post(`/intune/${tenantId}/devices/${deviceId}/sync`),
+    getCompliancePolicies: (tenantId: number) =>
+        api.get(`/intune/${tenantId}/compliance-policies`),
+    getConfigProfiles: (tenantId: number) =>
+        api.get(`/intune/${tenantId}/config-profiles`),
+};
+
+// ==================== Compliance / Purview API ====================
+export const complianceApi = {
+    getRetentionLabels: (tenantId: number) =>
+        api.get(`/compliance/${tenantId}/retention-labels`),
+    getSensitivityLabels: (tenantId: number) =>
+        api.get(`/compliance/${tenantId}/sensitivity-labels`),
+    getDlpPolicies: (tenantId: number) =>
+        api.get(`/compliance/${tenantId}/dlp-policies`),
+};
+
+// ==================== SharePoint Admin API ====================
+export const sharepointAdminApi = {
+    getSites: (tenantId: number) =>
+        api.get(`/sharepoint/${tenantId}/sites`),
+    getSite: (tenantId: number, siteId: string) =>
+        api.get(`/sharepoint/${tenantId}/sites/${siteId}`),
+    getSiteDrives: (tenantId: number, siteId: string) =>
+        api.get(`/sharepoint/${tenantId}/sites/${siteId}/drives`),
+    getSiteLists: (tenantId: number, siteId: string) =>
+        api.get(`/sharepoint/${tenantId}/sites/${siteId}/lists`),
+};
+
+// ==================== Teams Management API ====================
+export const teamsApi = {
+    list: (tenantId: number) =>
+        api.get(`/teams/${tenantId}`),
+    get: (tenantId: number, teamId: string) =>
+        api.get(`/teams/${tenantId}/${teamId}`),
+    create: (tenantId: number, data: any) =>
+        api.post(`/teams/${tenantId}`, data),
+    update: (tenantId: number, teamId: string, data: any) =>
+        api.patch(`/teams/${tenantId}/${teamId}`, data),
+    delete: (tenantId: number, teamId: string) =>
+        api.delete(`/teams/${tenantId}/${teamId}`),
+    getChannels: (tenantId: number, teamId: string) =>
+        api.get(`/teams/${tenantId}/${teamId}/channels`),
+    createChannel: (tenantId: number, teamId: string, data: any) =>
+        api.post(`/teams/${tenantId}/${teamId}/channels`, data),
+    deleteChannel: (tenantId: number, teamId: string, channelId: string) =>
+        api.delete(`/teams/${tenantId}/${teamId}/channels/${channelId}`),
+    getMembers: (tenantId: number, teamId: string) =>
+        api.get(`/teams/${tenantId}/${teamId}/members`),
+    getTags: (tenantId: number, teamId: string) =>
+        api.get(`/teams/${tenantId}/${teamId}/tags`),
+};
+

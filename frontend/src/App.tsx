@@ -17,6 +17,13 @@ import SettingsPage from './pages/Settings';
 import LoginPage from './pages/Login';
 import HealthReportPage from './pages/HealthReport';
 import ReportCenterPage from './pages/ReportCenter';
+import ExchangePage from './pages/Exchange';
+import EntraIdPage from './pages/EntraId';
+import SecurityPage from './pages/SecurityDefender';
+import IntunePage from './pages/Intune';
+import CompliancePage from './pages/Compliance';
+import SharePointAdminPage from './pages/SharePointAdmin';
+import TeamsAdminPage from './pages/TeamsAdmin';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -77,6 +84,14 @@ const AppRoutes: React.FC = () => {
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="health-report" element={<HealthReportPage />} />
                 <Route path="report-center" element={<ReportCenterPage />} />
+                {/* New management routes */}
+                <Route path="exchange" element={<ExchangePage />} />
+                <Route path="entra" element={<EntraIdPage />} />
+                <Route path="security" element={<SecurityPage />} />
+                <Route path="intune" element={<IntunePage />} />
+                <Route path="compliance" element={<CompliancePage />} />
+                <Route path="sharepoint" element={<SharePointAdminPage />} />
+                <Route path="teams" element={<TeamsAdminPage />} />
             </Route>
         </Routes>
     );

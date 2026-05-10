@@ -24,6 +24,13 @@ from app.routers import (
     storage_router,
     health_report_router,
     report_center_router,
+    exchange_router,
+    entra_router,
+    security_router,
+    intune_router,
+    compliance_router,
+    sharepoint_router,
+    teams_router,
 )
 from app.services.graph_client import GraphClient
 
@@ -79,6 +86,13 @@ app.include_router(reports_router, prefix=settings.API_V1_PREFIX, dependencies=a
 app.include_router(storage_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
 app.include_router(health_report_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
 app.include_router(report_center_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
+app.include_router(exchange_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
+app.include_router(entra_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
+app.include_router(security_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
+app.include_router(intune_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
+app.include_router(compliance_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
+app.include_router(sharepoint_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
+app.include_router(teams_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
 
 
 @app.get("/")
