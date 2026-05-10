@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  m365-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: m365-admin
+    ports:
+      - "${PORT:-5173}:80"
+    volumes:
+      # 持久化数据库
+      - ./data:/app/data
+      # 可选：挂载 .env 文件
+      # - ./.env:/app/.env:ro
+    environment:
+      # 数据库路径
+      - DATABASE_URL=sqlite+aiosqlite:///./data/m365_admin.db
+      # 安全密钥（生产环境请更改）
+      - SECRET_KEY=${SECRET_KEY:-your-super-secret-key-change-this}
+      # Tenant secret encryption key (Fernet)
+      - TENANT_SECRET_ENCRYPTION_KEY=${TENANT_SECRET_ENCRYPTION_KEY:-change-this-in-production-generate-fernet-key}
+      # CORS 配置
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173,http://localhost:3000}
+      # 调试模式
+      - DEBUG=false
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

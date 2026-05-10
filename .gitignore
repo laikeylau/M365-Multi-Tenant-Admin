@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+frontend/dist/
+backend/*.egg-info/
+
+# Secrets
+*.pem
+*.key
+client_secret*.json
+.ace-tool/
+.claude/
+
+# Sensitive scripts output
+scripts/*.json
+scripts/*.csv
+
+# Windows artifacts
+nul
