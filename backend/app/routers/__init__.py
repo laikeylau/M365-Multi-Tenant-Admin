@@ -21,6 +21,7 @@ from app.routers.intune import router as intune_router
 from app.routers.compliance import router as compliance_router
 from app.routers.sharepoint_admin import router as sharepoint_router
 from app.routers.teams_admin import router as teams_router
+from app.routers.auto_register import router as auto_register_router
 
 __all__ = [
     "tenants_router",
@@ -43,4 +44,5 @@ __all__ = [
     "compliance_router",
     "sharepoint_router",
     "teams_router",
+    "auto_register_router",
 ]

@@ -256,7 +256,13 @@ export const reportCenterApi = {
 
 export default api;
 
-// ==================== Exchange Online API ====================
+// ==================== Auto Register API ====================
+export const autoRegisterApi = {
+    start: () => api.post('/auto-register/start'),
+    status: (flowId: string, appName?: string) =>
+        api.get(`/auto-register/status/${flowId}`, { params: { app_name: appName } }),
+    cancel: (flowId: string) => api.delete(`/auto-register/cancel/${flowId}`),
+};
 export const exchangeApi = {
     getTransportRules: (tenantId: number) =>
         api.get(`/exchange/${tenantId}/transport-rules`),

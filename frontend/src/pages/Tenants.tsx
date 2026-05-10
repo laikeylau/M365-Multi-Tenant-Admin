@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { tenantApi, Tenant, TenantCreate } from '../services/api';
+import AutoRegisterModal from '../components/AutoRegisterModal';
 
 const TenantsPage: React.FC = () => {
     const [tenants, setTenants] = useState<Tenant[]>([]);
@@ -14,6 +15,7 @@ const TenantsPage: React.FC = () => {
         domain: '',
     });
     const [submitting, setSubmitting] = useState(false);
+    const [showAutoRegister, setShowAutoRegister] = useState(false);
 
     useEffect(() => {
         fetchTenants();
@@ -76,9 +78,14 @@ const TenantsPage: React.FC = () => {
             <div className="page-container">
                 <div className="page-header">
                     <h2 className="page-title">多租户管理</h2>
-                    <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-                        + 添加租户
-                    </button>
+                    <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                        <button className="btn btn-secondary" onClick={() => setShowAutoRegister(true)}>
+                            🚀 自动注册应用
+                        </button>
+                        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+                            + 添加租户
+                        </button>
+                    </div>
                 </div>
 
                 {loading ? (
@@ -141,14 +148,26 @@ const TenantsPage: React.FC = () => {
                             <div className="empty-state-icon">🏢</div>
                             <div className="empty-state-title">暂无租户</div>
                             <div className="empty-state-desc">
-                                点击上方按钮添加您的第一个 Microsoft 365 租户
+                                点击上方按钮添加您的第一个 Microsoft 365 租户，或使用"自动注册应用"一键创建
                             </div>
-                            <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-                                + 添加租户
-                            </button>
+                            <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'center' }}>
+                                <button className="btn btn-secondary" onClick={() => setShowAutoRegister(true)}>
+                                    🚀 自动注册应用
+                                </button>
+                                <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+                                    + 添加租户
+                                </button>
+                            </div>
                         </div>
                     </div>
-                )}
+                )}}
+
+                {/* Auto Register Modal */}
+                <AutoRegisterModal
+                    isOpen={showAutoRegister}
+                    onClose={() => setShowAutoRegister(false)}
+                    onSuccess={fetchTenants}
+                />
 
                 {/* Add Tenant Modal */}
                 {showModal && (

@@ -31,6 +31,7 @@ from app.routers import (
     compliance_router,
     sharepoint_router,
     teams_router,
+    auto_register_router,
 )
 from app.services.graph_client import GraphClient
 
@@ -73,6 +74,7 @@ if cors_origins:
 
 # Register routers
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
+app.include_router(auto_register_router, prefix=settings.API_V1_PREFIX)  # No auth required
 authz = [Depends(require_auth)]
 app.include_router(dashboard_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
 app.include_router(tenants_router, prefix=settings.API_V1_PREFIX, dependencies=authz)
